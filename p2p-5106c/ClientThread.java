@@ -16,13 +16,15 @@ public class ClientThread implements Runnable {
   FileInputStream fis = null;
   private String message;
   private int totalchunks;
+  private String filename;
 
-  public ClientThread (FinishedClientCounter fcc, Socket client, int[][] clientdwlist,int ClientID, int totalchunks) {     
+  public ClientThread (FinishedClientCounter fcc, Socket client, int[][] clientdwlist,int ClientID, int totalchunks, String filename) {     
     this.fcc = fcc;
     this.client = client;     
     this.ClientID = ClientID;
     this.clientdwlist = clientdwlist;
     this.totalchunks = totalchunks;
+    this.filename = filename;
   }    
   
   public void run(){     
@@ -45,7 +47,9 @@ public class ClientThread implements Runnable {
       dwcounter++;
       i++;
     }
-
+    
+    out.writeUTF(filename);
+    out.flush();
     out.writeUTF(Integer.toString(totalchunks)+"/"+Integer.toString(dwcounter));
     out.flush();
     System.out.println("Prepare to send "+dwcounter+" file chunks to Client "+ClientID);

@@ -15,14 +15,16 @@ public class CcThread implements Runnable {
   private String message;
   private String dir;
   private FileOutputStream fos;
+  private String filename;
   boolean[] receivedchunks;
 
   //constructor
-  public CcThread(Socket cclient, int ClientID, SharedData shareddata, int totalchunks){
+  public CcThread(Socket cclient, int ClientID, SharedData shareddata, int totalchunks, String filename){
     this.cclient = cclient;
     this.ClientID = ClientID;
     this.shareddata = shareddata;
     this.totalchunks = totalchunks;
+    this.filename = filename;
   }
   public void run(){
     try {
@@ -64,7 +66,6 @@ public class CcThread implements Runnable {
           String[] fpara = message.split(" ");
           int filesize = Integer.parseInt(fpara[1]);
           //download chunk
-          //TODO: delete dir, use method in csthread
           DownloadChunk(in, dir, fpara[0], filesize);
           System.out.println("CLIENT: Chunk "+ fpara[0]+" has been downloaded");
           
@@ -89,7 +90,7 @@ public class CcThread implements Runnable {
       catch(InterruptedException ie2){} 
       }
       // join chunks into a file
-      JoinChunks("a.JPG", dir);
+      JoinChunks(filename, dir);
     } catch (IOException e){
       e.printStackTrace();
     }

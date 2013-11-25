@@ -17,3 +17,5 @@ Client.class: Client.java
 	$(JC) $(JFLAGS) Client.java
 clean:
 	$(RM) *.class
+	$(RM) -rf Client_*
+	$(RM) -rf chunks

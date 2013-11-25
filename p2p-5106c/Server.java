@@ -10,15 +10,14 @@ public class Server {
 	Socket connection = null; //socket for the connection with the client
 	String message;    //message received from the client
 	String MESSAGE;    //uppercase message send to the client
-//	ObjectOutputStream out;  //stream write to the socket
-//	ObjectInputStream in;    //stream read from the socket
+  String filename;
   int ClientID = 1; //assign and track client ID
   int chunkcounter = 1; //count total chunk numbers
-  int[][] clientdwlist = new int[5][10]; //list to track downloaded chunk IDs for each client
+  int[][] clientdwlist = new int[5][7000]; //list to track downloaded chunk IDs for each client
 //constructor
   int MaxClientNumber = 5;
+  BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
   public void Server() {}
- 
   
   //split file into chunks, each chunk is 100kB 
   public void splitFile(String filename){
@@ -40,7 +39,7 @@ public class Server {
       //read 100kB each time, and create a new file for each read.
       while ((tmp = bis.read(bufferofChunk)) > 0){
         File newFile = new File(dir, Integer.toString(chunkcounter));
-        System.out.println("Chunk "+ chunkcounter +": " + tmp/1000 + "kB");
+       // System.out.println("Chunk "+ chunkcounter +": " + tmp/1000 + "kB");
         newFile.createNewFile();
         chunkcounter++;
         fos = new FileOutputStream(newFile);
@@ -79,7 +78,11 @@ public class Server {
 	
   void run()
 	{
-		try{
+    try{
+	    System.out.println("Please input the file name to be transmitted: ");
+      filename = bf.readLine();
+      splitFile(filename);
+      System.out.println("File Name: "+filename);
       //create a serversocket
 			sSocket = new ServerSocket(sPort, 5);
 			//Wait for connection
@@ -90,7 +93,7 @@ public class Server {
       while(true) {
         connection = sSocket.accept();
         ClientThread th;
-        th = new ClientThread(fcc, connection,clientdwlist,ClientID++, chunkcounter);
+        th = new ClientThread(fcc, connection,clientdwlist,ClientID++, chunkcounter, filename);
         Thread t = new Thread(th);
         t.start(); 
         if(ClientID > MaxClientNumber){
@@ -124,8 +127,9 @@ public class Server {
 
  	public static void main(String args[]) {
       Server s = new Server();
-      String filename = "a.JPG";
-      s.splitFile(filename);  
+      //filename = bf.readLine();
+     // filename = "a.JPG";
+     // s.splitFile(filename);  
       s.run();
  
     }

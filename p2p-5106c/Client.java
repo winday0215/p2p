@@ -13,6 +13,7 @@ public class Client {
   String ClientID;
   String message;                //message send to the server
 	String MESSAGE;                //capitalized message read from the server
+  String filename;
   File dir;
   ArrayList<String> chunklist;//save obtained chunks
   private int totalchunks;
@@ -30,10 +31,7 @@ public class Client {
 			out.flush();
 			in = new ObjectInputStream(requestSocket.getInputStream());
 			
-			//get Input from standard input
-		//	BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-  	 // while(true){
-        
+        // receive client ID
         message  = in.readUTF();
         System.out.println("Receive message: "+ message);
         if(message.substring(0,8).equals("ClientID")){
@@ -45,6 +43,13 @@ public class Client {
           requestSocket.close();
           return;
         }
+       
+       //recieve file name 
+        message = in.readUTF();
+        filename = message;
+        System.out.println("File to be received: "+filename);
+        
+        //receive chunks IDs
         message = in.readUTF();
         String[] cm = message.split("/");
         totalchunks = Integer.parseInt(cm[0]);
@@ -119,7 +124,7 @@ public class Client {
       ts.start();
 
       CcThread clientthread;
-      clientthread = new CcThread(requestSocket, iClientID, sd, totalchunks);
+      clientthread = new CcThread(requestSocket, iClientID, sd, totalchunks, filename);
       Thread tc = new Thread(clientthread);
       tc.start();
     }
